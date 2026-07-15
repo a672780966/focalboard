@@ -21,8 +21,15 @@ func Test36AddUniqueConstraintToCategoryBoards(t *testing.T) {
 		}
 
 		var count int
+		schema := ""
+		if th.IsMySQL() {
+			schema = "DATABASE()"
+		} else if th.IsPostgres() {
+			schema = "'public'"
+		}
 		query := "SELECT COUNT(*) FROM INFORMATION_SCHEMA.TABLE_CONSTRAINTS " +
-			"WHERE constraint_name = 'unique_user_category_board' " +
+			"WHERE constraint_schema = " + schema + " " +
+			"AND constraint_name = 'unique_user_category_board' " +
 			"AND constraint_type = 'UNIQUE' " +
 			"AND table_name = 'focalboard_category_boards'"
 		th.f.DB().Get(&count, query)
