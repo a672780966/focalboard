@@ -91,7 +91,6 @@ const PersonSelector = (props: Props): JSX.Element => {
 
         return (
             <div
-                key={user.id}
                 className={isMulti ? 'MultiPerson-item' : 'Person-item'}
             >
                 {profileImg && (
@@ -172,7 +171,11 @@ const PersonSelector = (props: Props): JSX.Element => {
     if (readOnly) {
         return (
             <div className={`${primaryClass}${secondaryClass}`}>
-                {users.map((user) => formatOptionLabel(user))}
+                {users.map((user, index) => (
+                    <React.Fragment key={userIDs[index]}>
+                        {formatOptionLabel(user)}
+                    </React.Fragment>
+                ))}
             </div>
         )
     }
