@@ -33,8 +33,8 @@ beforeEach(() => {
 
 const reactKeyWarning = (args: unknown[]) => {
     const message = args.map(String).join(' ')
-    return /Encountered two children with the same key/.test(message) ||
-        /Each child in a list should have a unique "key" prop/.test(message)
+    return (/Encountered two children with the same key/).test(message) ||
+        (/Each child in a list should have a unique "key" prop/).test(message)
 }
 
 jest.mock('../../mutator')
