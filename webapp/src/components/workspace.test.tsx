@@ -91,6 +91,7 @@ const me: IUser = {
 }
 
 const categoryAttribute1 = TestBlockFactory.createCategoryBoards()
+categoryAttribute1.id = 'category1'
 categoryAttribute1.name = 'Category 1'
 categoryAttribute1.boardMetadata = [{boardID: board.id, hidden: false}]
 
