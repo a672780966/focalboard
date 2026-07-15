@@ -31,6 +31,12 @@ beforeEach(() => {
     FetchMock.fn.mockReset()
 })
 
+const reactKeyWarning = (args: unknown[]) => {
+    const message = args.map(String).join(' ')
+    return (/Encountered two children with the same key/).test(message) ||
+        (/Each child in a list should have a unique "key" prop/).test(message)
+}
+
 jest.mock('../../mutator')
 jest.mock('../../utils')
 jest.mock('../../telemetry/telemetryClient')
@@ -745,5 +751,65 @@ describe('components/table/Table extended', () => {
         userEvents.click(duplicateBtn)
         expect(mockedMutator.duplicateCard).toBeCalledTimes(1)
         expect(container).toMatchSnapshot()
+    })
+
+    test('does not emit React duplicate or missing key warnings', () => {
+        const board = TestBlockFactory.createBoard()
+        const propertyId = Utils.createGuid(IDType.User)
+        board.cardProperties.push({
+            id: propertyId,
+            name: 'Last Modified By',
+            type: 'updatedBy',
+            options: [],
+        })
+
+        const card1 = TestBlockFactory.createCard(board)
+        card1.title = 'card1'
+        card1.updateAt = Date.parse('15 Jun 2021 16:22:00')
+        const card2 = TestBlockFactory.createCard(board)
+        card2.title = 'card2'
+        card2.updateAt = Date.parse('15 Jun 2021 16:22:00')
+
+        const view = TestBlockFactory.createBoardView(board)
+        view.fields.viewType = 'table'
+        view.fields.groupById = undefined
+        view.fields.visiblePropertyIds = ['property1', 'property2', propertyId]
+
+        const mockStore = configureStore([])
+        const store = mockStore({
+            ...state,
+            cards: {
+                cards: {
+                    [card1.id]: card1,
+                    [card2.id]: card2,
+                },
+            },
+        })
+
+        const consoleError = jest.spyOn(console, 'error').mockImplementation(() => {})
+
+        render(wrapDNDIntl(
+            <ReduxProvider store={store}>
+                <Table
+                    board={board}
+                    activeView={view}
+                    visibleGroups={[]}
+                    cards={[card1, card2]}
+                    views={[view]}
+                    selectedCardIds={[]}
+                    readonly={false}
+                    cardIdToFocusOnRender=''
+                    showCard={jest.fn()}
+                    addCard={jest.fn()}
+                    onCardClicked={jest.fn()}
+                    hiddenCardsCount={0}
+                    showHiddenCardCountNotification={jest.fn()}
+                />
+            </ReduxProvider>,
+        ))
+
+        const keyWarnings = consoleError.mock.calls.filter((args) => reactKeyWarning(args))
+        expect(keyWarnings).toEqual([])
+        consoleError.mockRestore()
     })
 })

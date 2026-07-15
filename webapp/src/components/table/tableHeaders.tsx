@@ -112,6 +112,7 @@ const TableHeaders = (props: Props): JSX.Element => {
             id='mainBoardHeader'
         >
             <TableHeader
+                key={Constants.titleColumnId}
                 name={
                     <FormattedMessage
                         id='TableComponent.name'
@@ -130,7 +131,7 @@ const TableHeaders = (props: Props): JSX.Element => {
             />
 
             {/* Table header row */}
-            {visiblePropertyTemplates.map((template) => {
+            {visiblePropertyTemplates.map((template, idx) => {
                 let sorted: 'up' | 'down' | 'none' = 'none'
                 const sortOption = activeView.fields.sortOptions.find((o: ISortOption) => o.propertyId === template.id)
                 if (sortOption) {
@@ -138,6 +139,7 @@ const TableHeaders = (props: Props): JSX.Element => {
                 }
                 return (
                     <TableHeader
+                        key={template.id || `header-${idx}`}
                         name={template.name}
                         sorted={sorted}
                         readonly={props.readonly}
@@ -146,7 +148,6 @@ const TableHeaders = (props: Props): JSX.Element => {
                         cards={cards}
                         views={views}
                         template={template}
-                        key={template.id}
                         onDrop={onDropToColumn}
                         onAutoSizeColumn={onAutoSizeColumn}
                     />

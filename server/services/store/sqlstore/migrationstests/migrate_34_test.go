@@ -16,7 +16,7 @@ func Test34DropDeleteAtColumnMySQLPostgres(t *testing.T) {
 		// migration 34 only works for MySQL and PostgreSQL
 		if th.IsMySQL() {
 			var count int
-			query := "SELECT COUNT(column_name) FROM INFORMATION_SCHEMA.COLUMNS WHERE table_name = 'focalboard_category_boards' AND column_name = 'delete_at'"
+			query := "SELECT COUNT(column_name) FROM INFORMATION_SCHEMA.COLUMNS WHERE table_schema = DATABASE() AND table_name = 'focalboard_category_boards' AND column_name = 'delete_at'"
 			th.f.DB().Get(&count, query)
 			require.Equal(t, 0, count)
 		} else if th.IsPostgres() {
@@ -44,7 +44,7 @@ func Test34DropDeleteAtColumnMySQLPostgres(t *testing.T) {
 
 		if th.IsMySQL() {
 			var count int
-			query := "SELECT COUNT(column_name) FROM INFORMATION_SCHEMA.COLUMNS WHERE table_name = 'focalboard_category_boards' AND column_name = 'delete_at'"
+			query := "SELECT COUNT(column_name) FROM INFORMATION_SCHEMA.COLUMNS WHERE table_schema = DATABASE() AND table_name = 'focalboard_category_boards' AND column_name = 'delete_at'"
 			th.f.DB().Get(&count, query)
 			require.Equal(t, 0, count)
 		} else if th.IsPostgres() {

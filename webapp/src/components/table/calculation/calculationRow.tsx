@@ -51,13 +51,13 @@ const CalculationRow = (props: Props): JSX.Element => {
             onMouseLeave={() => setHovered(false)}
         >
             {
-                visiblePropertyTemplates.map((template) => {
+                visiblePropertyTemplates.map((template, idx) => {
                     const defaultValue = template.id === Constants.titleColumnId ? Options.count.value : Options.none.value
                     const value = selectedCalculations[template.id] || defaultValue
 
                     return (
                         <Calculation
-                            key={template.id}
+                            key={template.id || `calculation-${idx}`}
                             class={`octo-table-cell ${readonly ? 'disabled' : ''}`}
                             value={value}
                             menuOpen={Boolean(readonly ? false : showOptions.get(template.id))}

@@ -228,11 +228,11 @@ const TableRow = (props: Props) => {
             </div>
 
             {/* Columns, one per property */}
-            {visiblePropertyTemplates.map((template) => {
+            {visiblePropertyTemplates.map((template, idx) => {
                 return (
                     <div
+                        key={template.id || `property-${idx}`}
                         className='octo-table-cell'
-                        key={template.id}
                         style={{width: columnResize.width(template.id)}}
                         ref={(ref) => columnResize.updateRef(card.id, template.id, ref)}
                     >

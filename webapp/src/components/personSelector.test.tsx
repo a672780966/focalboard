@@ -215,6 +215,50 @@ describe('properties/person', () => {
         }
     })
 
+    test('readOnly multi does not emit React unique key warnings and preserves order', async () => {
+        const reactKeyWarning = (args: unknown[]) => {
+            const message = args.map(String).join(' ')
+            return (/Encountered two children with the same key/).test(message) ||
+                (/Each child in a list should have a unique "key" prop/).test(message)
+        }
+
+        const consoleError = jest.spyOn(console, 'error').mockImplementation(() => {})
+
+        const store = mockStore(state)
+        const component = wrapIntl(
+            <ReduxProvider store={store}>
+                <PersonSelector
+                    readOnly={true}
+                    userIDs={['user-id-2', 'user-id-1', 'user-id-3']}
+                    allowAddUsers={false}
+                    property={new PersonProperty()}
+                    emptyDisplayValue={'Empty'}
+                    isMulti={true}
+                    closeMenuOnSelect={true}
+                    onChange={() => {}}
+                />
+            </ReduxProvider>,
+        )
+
+        const renderResult = render(component)
+        const container = await waitFor(() => {
+            if (!renderResult.container) {
+                return Promise.reject(new Error('container not found'))
+            }
+            return Promise.resolve(renderResult.container)
+        })
+
+        const items = container.querySelectorAll('.MultiPerson-item')
+        expect(items).toHaveLength(3)
+        expect(items[0].textContent).toContain('username-2')
+        expect(items[1].textContent).toContain('username-1')
+        expect(items[2].textContent).toContain('username-3')
+
+        const keyWarnings = consoleError.mock.calls.filter((args) => reactKeyWarning(args))
+        expect(keyWarnings).toEqual([])
+        consoleError.mockRestore()
+    })
+
     test('show multiple', async () => {
         const store = mockStore(state)
         const component = wrapIntl(
